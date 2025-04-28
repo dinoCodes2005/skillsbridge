@@ -4,8 +4,16 @@ import { Profile } from "../models/profileModel";
 export const createProfile = async (req: Request, res: Response) => {
   try {
     console.log(req.body);
-    const { phone, email, first_name, last_name, language, type } = req.body;
-    if ((!phone && !email) || !first_name || !last_name || !language || !type) {
+    const { phone, email, first_name, last_name, language, type, gender } =
+      req.body;
+    if (
+      (!phone && !email) ||
+      !first_name ||
+      !last_name ||
+      !language ||
+      !type ||
+      !gender
+    ) {
       res.status(400).json({ error: "Fill all the fields correctly !!!" });
       return;
     }
@@ -21,6 +29,7 @@ export const createProfile = async (req: Request, res: Response) => {
           last_name,
           language,
           type,
+          gender,
         },
         {
           new: true,
@@ -40,6 +49,7 @@ export const createProfile = async (req: Request, res: Response) => {
       last_name,
       language,
       type,
+      gender,
     });
 
     const savedProfile = await newProfile.save();
@@ -74,6 +84,7 @@ export const findProfile = async (req: Request, res: Response) => {
         last_name: existingProfile.last_name,
         language: existingProfile.language,
         type: existingProfile.type,
+        gender: existingProfile.gender,
       });
       return;
     }

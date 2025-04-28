@@ -21,6 +21,15 @@ import { signOut } from "firebase/auth";
 import { useAuth } from "./my-components/authProvider";
 import ToggleTheme from "./my-components/toggle-theme";
 import { Button } from "./button";
+import { useSession } from "next-auth/react";
+import { useProfile } from "./my-components/profileProvider";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Badge } from "./badge";
+
+import { Label } from "@radix-ui/react-label";
+import { Input } from "./input";
+import Profile from "./my-components/profile-dialog";
+import ProfileDialog from "./my-components/profile-dialog";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -62,6 +71,7 @@ const components: { title: string; href: string; description: string }[] = [
 
 export function Navbar({ className }: { className?: string }) {
   const { user } = useAuth();
+  const { profile } = useProfile();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const toggleMenu = () => {
@@ -99,15 +109,26 @@ export function Navbar({ className }: { className?: string }) {
 
         <div className="flex items-center space-x-2">
           <Link href="/profile">
-            <Image
-              src="/image.png"
-              alt="Profile Picture"
-              width={36}
-              height={36}
-              className="rounded-full hover:brightness-125"
-            />
+            <Avatar>
+              <AvatarImage
+                className="h-10 w-10 rounded-full ml-4"
+                src="https://github.com/shadcn.png"
+                alt="Profile"
+              />
+              <AvatarFallback>SB</AvatarFallback>
+            </Avatar>
+
+            {profile?.type && (
+              <Badge className="fixed right-0 mr-4 mt-4">
+                {" "}
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                {profile.type === "worker"
+                  ? "Worker Status"
+                  : "Consumer Status"}
+              </Badge>
+            )}
           </Link>
-          <ToggleTheme />
+          <ToggleTheme className="fixed right-0 top-0" />
         </div>
       </div>
 
@@ -237,15 +258,17 @@ export function Navbar({ className }: { className?: string }) {
             <Button onClick={handleLogout}>Sign Out</Button>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/profile">
-              <Image
-                src="/image.png"
-                alt="Profile Picture"
-                width={40}
-                height={40}
-                className="rounded-full ml-4 hover:brightness-125"
-              />
-            </Link>
+            <ProfileDialog />
+
+            {profile?.type && (
+              <Badge className="fixed right-0 mr-4 mt-4">
+                {" "}
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                {profile.type === "worker"
+                  ? "Worker Status"
+                  : "Consumer Status"}
+              </Badge>
+            )}
             <ToggleTheme className="hidden md:block fixed right-0 top-0" />
           </NavigationMenuItem>
         </NavigationMenuList>

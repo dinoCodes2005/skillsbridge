@@ -1,4 +1,6 @@
 import { Schema, model, Document } from "mongoose";
+import { iWorker } from "./workerProfileModel";
+import { iConsumer } from "./consumerProfileModel";
 
 export interface iProfile extends Document {
   phone: string;
@@ -7,6 +9,9 @@ export interface iProfile extends Document {
   last_name: string;
   language: string;
   type: "consumer" | "worker" | "";
+  gender: "male" | "female";
+  worker: iWorker;
+  consumer: iConsumer;
 }
 
 const ProfileSchema = new Schema<iProfile>({
@@ -33,6 +38,20 @@ const ProfileSchema = new Schema<iProfile>({
   type: {
     type: String,
     required: true,
+  },
+  gender: {
+    type: String,
+    required: false,
+  },
+  worker: {
+    type: Schema.Types.ObjectId,
+    ref: "Worker_Profile",
+    required: false,
+  },
+  consumer: {
+    type: Schema.Types.ObjectId,
+    ref: "Consumer_Profile",
+    required: false,
   },
 });
 

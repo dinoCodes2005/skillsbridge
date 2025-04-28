@@ -8,7 +8,7 @@ export default function ToggleTheme({ className = "" }) {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className={cn(className, "md:mr-4 md:mt-4")}>
+    <div className={cn(className, "mr-4 mt-4")}>
       <Button
         variant="outline"
         size="icon"

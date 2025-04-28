@@ -35,6 +35,7 @@ import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/ui/Navbar";
 import { useSession } from "next-auth/react";
 import { Commet } from "react-loading-indicators";
+import { IconGenderMale, IconGenderFemale } from "@tabler/icons-react";
 
 export default function page() {
   const { data: session } = useSession();
@@ -45,6 +46,7 @@ export default function page() {
   const [lastName, setLastName] = useState<string>("");
   const [language, setLanguage] = useState<string>("");
   const [userType, setUserType] = useState<"worker" | "consumer" | "">("");
+  const [gender, setGender] = useState<"male" | "female" | "">("");
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const router = useRouter();
@@ -79,19 +81,21 @@ export default function page() {
     const handleFetch = async () => {
       if (phoneNumber || email) {
         const response = await axios.post(
-          "http://localhost:8000/api/fetch-profile",
+          process.env.NEXT_PUBLIC_FETCH_PROFILE as string,
           {
             phone: phoneNumber,
             email: email,
             fetchType: "fetching",
           }
         );
+        console.log(response?.data);
         if (response.status === 200) {
           setNewUser(false);
           setFirstName(response?.data.first_name);
           setLastName(response?.data.last_name);
           setLanguage(response?.data.language);
           setUserType(response?.data.type);
+          setGender(response?.data.gender);
         }
         if (response.status === 400) {
           setNewUser(true);
@@ -115,9 +119,10 @@ export default function page() {
         formData.append("last_name", lastName);
         formData.append("language", language);
         formData.append("type", userType);
-        console.log(formData);
+        formData.append("gender", gender);
+
         const response = await axios.post(
-          "http://localhost:8000/api/create-profile",
+          process.env.NEXT_PUBLIC_CREATE_PROFILE as string,
           formData
         );
         if (response.status === 201 || response.status === 200)
@@ -180,10 +185,51 @@ export default function page() {
               </div>
               <div className="flex justify-between space-x-2">
                 <Button
+                  variant={gender === "male" ? "default" : "outline"}
+                  className={`w-1/2 relative transition-all duration-300 ${
+                    gender === "male"
+                      ? "bg-blue-950 hover:bg-blue-900 text-white shadow-md scale-105"
+                      : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setGender("male");
+                  }}
+                >
+                  {gender === "male" && (
+                    <Check className="w-4 h-4 absolute left-2 animate-pulse" />
+                  )}
+                  <IconGenderMale stroke={2} className="text-blue-600" />
+                  <span className={gender === "male" ? "ml-2" : ""}>Male</span>
+                </Button>
+
+                <Button
+                  variant={gender === "female" ? "default" : "outline"}
+                  className={`w-1/2 relative transition-all duration-300 ${
+                    gender === "female"
+                      ? "bg-pink-950 hover:bg-pink-900 text-white shadow-md scale-105"
+                      : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setGender("female");
+                  }}
+                >
+                  {gender === "female" && (
+                    <Check className="w-4 h-4 absolute left-2 animate-pulse" />
+                  )}
+                  <IconGenderFemale stroke={2} className="text-pink-400" />
+                  <span className={gender === "female" ? "ml-2" : ""}>
+                    Female
+                  </span>
+                </Button>
+              </div>
+              <div className="flex justify-between space-x-2">
+                <Button
                   variant={userType === "worker" ? "default" : "outline"}
                   className={`w-1/2 relative transition-all duration-300 ${
                     userType === "worker"
-                      ? "bg-green-500 hover:bg-green-600 text-white shadow-md scale-105"
+                      ? "bg-green-800 hover:bg-green-700 text-white shadow-md scale-105"
                       : ""
                   }`}
                   onClick={(e) => {
@@ -203,7 +249,7 @@ export default function page() {
                   variant={userType === "consumer" ? "default" : "outline"}
                   className={`w-1/2 relative transition-all duration-300 ${
                     userType === "consumer"
-                      ? "bg-green-500 hover:bg-green-600 text-white shadow-md scale-105"
+                      ? "bg-green-800 hover:bg-green-700 text-white shadow-md scale-105"
                       : ""
                   }`}
                   onClick={(e) => {

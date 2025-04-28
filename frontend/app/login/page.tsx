@@ -141,7 +141,7 @@ export default function LoginPage() {
         const token = await loggedInUser?.getIdToken();
         document.cookie = `authToken=${token}`;
         const response = await axios.post(
-          "http://localhost:8000/api/fetch-profile",
+          process.env.NEXT_PUBLIC_FETCH_PROFILE as string,
           { phone: mobileNumber, fetchType: "finding" }
         );
         if (response.status === 201) {
@@ -280,7 +280,9 @@ export default function LoginPage() {
                     <div className="flex flex-col gap-4 justify-center">
                       <Button
                         variant={"outline"}
-                        onClick={() => signIn("google")}
+                        onClick={() =>
+                          signIn("google", { callbackUrl: "/home" })
+                        }
                       >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                           <path
