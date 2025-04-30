@@ -78,6 +78,7 @@ export const findProfile = async (req: Request, res: Response) => {
     }
     if (fetchType === "fetching") {
       res.status(200).json({
+        _id: existingProfile._id,
         phone: existingProfile.phone,
         email: existingProfile.email,
         first_name: existingProfile.first_name,

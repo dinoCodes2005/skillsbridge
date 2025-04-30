@@ -83,7 +83,6 @@ export default function ProfileDialog() {
             fetchType: "fetching",
           }
         );
-        console.log(response?.data);
         if (response.status === 200) {
           setNewUser(false);
           setFirstName(response?.data.first_name);
@@ -140,7 +139,7 @@ export default function ProfileDialog() {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Avatar className="cursor-pointer ml-4">
+          <Avatar className="cursor-pointer mr-12">
             <AvatarImage
               className="h-10 w-10 rounded-full "
               src="https://github.com/shadcn.png"

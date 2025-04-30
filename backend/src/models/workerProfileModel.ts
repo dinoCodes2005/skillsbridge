@@ -17,15 +17,9 @@ type WorkingTime = {
   end: string;
 };
 
-type Location = {
-  lat: number;
-  lon: number;
-};
-
 export interface iWorker extends Document {
   profession: Profession;
   address: string;
-  location: Location;
   about: string;
   isAvailable: boolean;
   working_time: WorkingTime;
@@ -50,13 +44,6 @@ const WorkerProfileSchema = new Schema<iWorker>({
   address: {
     type: String,
     required: true,
-  },
-  location: {
-    type: {
-      lat: { type: Number },
-      lon: { type: Number },
-    },
-    required: false,
   },
   about: {
     type: String,

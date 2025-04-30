@@ -11,7 +11,13 @@ import React, {
 import { useAuth } from "./authProvider";
 import { useSession } from "next-auth/react";
 
+export type Location = {
+  type: "Point";
+  coordinates: [number, number]; // [lng, lat]
+};
+
 export interface iProfile {
+  _id: string;
   phone: string;
   first_name: string;
   last_name: string;
@@ -22,64 +28,76 @@ export interface iProfile {
 
 type ProfileContextType = {
   profile: iProfile | null;
+  location: Location;
+  setLocation: React.Dispatch<React.SetStateAction<Location>>;
+  currentAddress: string;
+  setCurrentAddress: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const ProfileContext = createContext<ProfileContextType>({ profile: null });
+const ProfileContext = createContext<ProfileContextType>({
+  profile: null,
+  location: {
+    type: "Point",
+    coordinates: [80.15072331174775, 12.8391499027704],
+  },
+  setLocation: () => {},
+  currentAddress: "",
+  setCurrentAddress: () => {},
+});
 export default function ProfileProvider({ children }: { children: ReactNode }) {
   const { data: session } = useSession();
   const { user } = useAuth();
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [language, setLanguage] = useState<string>("");
-  const [userType, setUserType] = useState<"worker" | "consumer" | "">("");
-  const [gender, setGender] = useState<"male" | "female" | "">("");
+
+  const [profile, setProfile] = useState<iProfile | null>(null);
+  const [location, setLocation] = useState<Location>({
+    type: "Point",
+    coordinates: [80.15072331174775, 12.839149902770407],
+  });
+  const [currentAddress, setCurrentAddress] = useState("");
 
   useEffect(() => {
-    user?.phoneNumber && setPhoneNumber(user?.phoneNumber);
-    session?.user?.email && setEmail(session?.user?.email);
-  }, [session, user]);
+    if (!session?.user?.email && !user?.phoneNumber) return;
 
-  useEffect(() => {
-    const handleFetch = async () => {
-      if (phoneNumber || email) {
-        const response = await axios.post(
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.post(
           process.env.NEXT_PUBLIC_FETCH_PROFILE as string,
           {
-            phone: phoneNumber,
-            email: email,
+            phone: user?.phoneNumber,
+            email: session?.user?.email,
             fetchType: "fetching",
           }
         );
-        if (response.status === 200) {
-          setFirstName(response?.data.first_name);
-          setLastName(response?.data.last_name);
-          setLanguage(response?.data.language);
-          setUserType(response?.data.type);
-          setGender(response?.data.gender);
+        if (res.status === 200) {
+          const data = res.data;
+          setProfile({
+            _id: data._id,
+            phone: user?.phoneNumber || "",
+            first_name: data.first_name,
+            last_name: data.last_name,
+            language: data.language,
+            type: data.type,
+            gender: data.gender,
+          });
         }
+      } catch (err) {
+        console.log("Fetch Profile Error:", err);
       }
     };
 
-    (user?.phoneNumber || session?.user?.email) && handleFetch();
-  }, [user, session]);
-
-  useEffect(() => {
-    user?.phoneNumber && setPhoneNumber(user?.phoneNumber);
-  }, [user]);
-
-  const profile: iProfile = {
-    phone: phoneNumber,
-    first_name: firstName,
-    last_name: lastName,
-    language: language,
-    type: userType,
-    gender: gender,
-  };
+    fetchProfile();
+  }, [session?.user?.email, user?.phoneNumber]);
 
   return (
-    <ProfileContext.Provider value={{ profile }}>
+    <ProfileContext.Provider
+      value={{
+        profile,
+        location,
+        setLocation,
+        currentAddress,
+        setCurrentAddress,
+      }}
+    >
       {children}
     </ProfileContext.Provider>
   );

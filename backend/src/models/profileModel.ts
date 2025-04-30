@@ -12,6 +12,7 @@ export interface iProfile extends Document {
   gender: "male" | "female";
   worker: iWorker;
   consumer: iConsumer;
+  location: Location;
 }
 
 const ProfileSchema = new Schema<iProfile>({

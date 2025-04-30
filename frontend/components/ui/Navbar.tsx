@@ -108,26 +108,14 @@ export function Navbar({ className }: { className?: string }) {
         </button>
 
         <div className="flex items-center space-x-2">
-          <Link href="/profile">
-            <Avatar>
-              <AvatarImage
-                className="h-10 w-10 rounded-full ml-4"
-                src="https://github.com/shadcn.png"
-                alt="Profile"
-              />
-              <AvatarFallback>SB</AvatarFallback>
-            </Avatar>
-
-            {profile?.type && (
-              <Badge className="fixed right-0 mr-4 mt-4">
-                {" "}
-                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                {profile.type === "worker"
-                  ? "Worker Status"
-                  : "Consumer Status"}
-              </Badge>
-            )}
-          </Link>
+          <ProfileDialog />
+          {profile?.type && (
+            <Badge className="fixed right-0 mr-4 mt-24">
+              {" "}
+              <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              {profile.type === "worker" ? "Worker Status" : "Consumer Status"}
+            </Badge>
+          )}
           <ToggleTheme className="fixed right-0 top-0" />
         </div>
       </div>

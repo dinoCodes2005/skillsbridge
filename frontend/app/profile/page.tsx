@@ -39,6 +39,7 @@ import { IconGenderMale, IconGenderFemale } from "@tabler/icons-react";
 
 export default function page() {
   const { data: session } = useSession();
+
   const { user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");

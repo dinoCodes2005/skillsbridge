@@ -12,16 +12,10 @@ type Profession = [
   | "painter"
 ];
 
-type Location = {
-  lat: number;
-  lon: number;
-};
-
 type PaymentMethod = "cash" | "upi" | "credit_card" | "debit_card";
 
 export interface iConsumer extends Document {
   address: string;
-  location: Location;
   preferred_services: Profession[];
   about: string;
   payment_method: PaymentMethod;
@@ -32,13 +26,7 @@ const ConsumerProfileSchema = new Schema<iConsumer>({
     type: String,
     required: true,
   },
-  location: {
-    type: {
-      lat: { type: Number },
-      lon: { type: Number },
-    },
-    required: false,
-  },
+
   preferred_services: {
     type: [String],
     required: false,

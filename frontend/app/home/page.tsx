@@ -18,14 +18,92 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
 import { MapPin, Search } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { start } from "repl";
+import { io } from "socket.io-client";
 
+const socket = io(process.env.NEXT_PUBLIC_BACKEND_WEBSOCKET_URL); // Adjust the URL if needed
 export default function Page() {
   const { user } = useAuth();
-  const { profile } = useProfile();
+  const router = useRouter();
+  const { profile, location, setLocation, currentAddress, setCurrentAddress } =
+    useProfile();
   const { data: session } = useSession();
+
+  const [service, setService] = useState("");
+  const [problem, setProblem] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      console.log("SESSION DATA: ", session);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (profile) {
+      console.log("PROFILE DATA: ", profile);
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    console.log(service, problem, currentAddress, location);
+  }, [currentAddress, service, problem]);
+
+  // Setup socket connection
+  useEffect(() => {
+    // On component mount, establish the WebSocket connection
+    socket.on("connect", () => {
+      console.log("Frontend message : Connected to server with ID:", socket.id);
+    });
+
+    socket.on("problem", (data) => {
+      console.log(data);
+    });
+
+    // Clean up the socket connection when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json`,
+        {
+          params: {
+            latlng: `${location.coordinates[0]},${location.coordinates[1]}`,
+            key: process.env.NEXT_PUBLIC_GOOGLE_MAP_API,
+          },
+        }
+      );
+      console.log(response.data);
+    })();
+    console.log(
+      `Current Location: Lng-${location.coordinates[0]}, Lat-${location.coordinates[1]}  `
+    );
+  }, [location]);
+
+  const handleSearch = () => {
+    socket.emit("problem", {
+      owner: profile?._id,
+      service,
+      problem,
+      currentAddress,
+      location: {
+        type: "Point",
+        coordinates: [location?.coordinates[0], location?.coordinates[1]],
+      },
+    });
+  };
 
   return (
     <>
@@ -53,7 +131,10 @@ export default function Page() {
                       >
                         Select Type of Service
                       </Label>
-                      <Select>
+                      <Select
+                        value={service}
+                        onValueChange={(value) => setService(value)}
+                      >
                         <SelectTrigger id="service-type" className="w-full">
                           <SelectValue placeholder="Select Service" />
                         </SelectTrigger>
@@ -87,6 +168,10 @@ export default function Page() {
                         Describe Your Problem
                       </Label>
                       <Textarea
+                        value={problem}
+                        onChange={(e) => {
+                          setProblem(e.target.value);
+                        }}
                         id="problem"
                         className="min-h-[80px] md:min-h-[100px] resize-none"
                         placeholder="Please describe the issue you're facing..."
@@ -105,12 +190,18 @@ export default function Page() {
                           id="location"
                           className="flex-1"
                           placeholder="Enter your address"
+                          value={currentAddress}
+                          onChange={(e) => setCurrentAddress(e.target.value)}
                         />
                         <MapDialog />
                       </div>
                     </div>
 
-                    <Button className="w-full mt-2" size="lg">
+                    <Button
+                      onClick={handleSearch}
+                      className="w-full mt-2"
+                      size="lg"
+                    >
                       <Search className="mr-2 h-4 w-4" /> Find Professionals
                     </Button>
                   </CardContent>
