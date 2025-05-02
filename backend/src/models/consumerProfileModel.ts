@@ -1,7 +1,7 @@
 import { Schema, model, Document } from "mongoose";
 import { iProfile } from "./profileModel";
 
-type Profession = [
+export type Profession = [
   | "electrician"
   | "plumber"
   | "carpenter"
@@ -12,7 +12,7 @@ type Profession = [
   | "painter"
 ];
 
-type PaymentMethod = "cash" | "upi" | "credit_card" | "debit_card";
+export type PaymentMethod = "cash" | "upi" | "credit_card" | "debit_card";
 
 export interface iConsumer extends Document {
   address: string;

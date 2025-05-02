@@ -35,8 +35,15 @@ socket.on("connection", (connection) => {
     console.log(data);
 
     const problem = await Problem.create(data);
-
-    socket.emit("problem", problem);
+    if (problem) {
+      socket.emit("problem", problem);
+      connection.emit("problem-confirmation", {
+        success: true,
+        message:
+          "Your Problem has been posted. Professionals will contact you soon !!",
+        problemId: problem._id,
+      });
+    }
   });
 });
 

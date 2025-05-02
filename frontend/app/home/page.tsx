@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/components/ui/my-components/authProvider";
+import { useAuth } from "@/components/ui/providers/authProvider";
 import MapDialog from "@/components/ui/my-components/map-dialog";
-import { useProfile } from "@/components/ui/my-components/profileProvider";
+import { useProfile } from "@/components/ui/providers/profileProvider";
 import { Navbar } from "@/components/ui/Navbar";
 import {
   Select,
@@ -28,6 +28,18 @@ import { start } from "repl";
 import { io } from "socket.io-client";
 
 const socket = io(process.env.NEXT_PUBLIC_BACKEND_WEBSOCKET_URL); // Adjust the URL if needed
+
+export type Location = {
+  type: "Point";
+  coordinates: [number, number]; // [lng, lat]
+};
+
+export type Problem = {
+  service: string;
+  problem: string;
+  currentAddress: string;
+  location: Location;
+};
 export default function Page() {
   const { user } = useAuth();
   const router = useRouter();
@@ -40,6 +52,16 @@ export default function Page() {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+
+  const [broadcast, setBroadcast] = useState<Problem>({
+    service: "",
+    problem: "",
+    currentAddress: "",
+    location: {
+      type: "Point",
+      coordinates: [76.5048004, 35.8799866],
+    },
+  });
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -74,23 +96,23 @@ export default function Page() {
     };
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json`,
-        {
-          params: {
-            latlng: `${location.coordinates[0]},${location.coordinates[1]}`,
-            key: process.env.NEXT_PUBLIC_GOOGLE_MAP_API,
-          },
-        }
-      );
-      console.log(response.data);
-    })();
-    console.log(
-      `Current Location: Lng-${location.coordinates[0]}, Lat-${location.coordinates[1]}  `
-    );
-  }, [location]);
+  // useEffect(() => {
+  //   (async () => {
+  //     const response = await axios.get(
+  //       `https://maps.googleapis.com/maps/api/geocode/json`,
+  //       {
+  //         params: {
+  //           latlng: `${location.coordinates[1]},${location.coordinates[0]}`,
+  //           key: process.env.NEXT_PUBLIC_GOOGLE_MAP_API,
+  //         },
+  //       }
+  //     );
+  //     console.log(response.data);
+  //   })();
+  //   console.log(
+  //     `Current Location: Lng-${location.coordinates[0]}, Lat-${location.coordinates[1]}  `
+  //   );
+  // }, [location]);
 
   const handleSearch = () => {
     socket.emit("problem", {
@@ -102,6 +124,13 @@ export default function Page() {
         type: "Point",
         coordinates: [location?.coordinates[0], location?.coordinates[1]],
       },
+    });
+
+    socket.on("problem-confirmation", (data) => {
+      if (data.success) {
+        router.push(`/track-problem/${data.problemId}`);
+        console.log("Ho gya object create ; Object ID  :", data.problemId);
+      }
     });
   };
 

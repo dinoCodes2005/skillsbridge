@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AlertCircle, Check } from "lucide-react";
-import { useAuth } from "@/components/ui/my-components/authProvider";
+import { useAuth } from "@/components/ui/providers/authProvider";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -78,7 +78,6 @@ export default function ProfileDialog() {
         const response = await axios.post(
           process.env.NEXT_PUBLIC_FETCH_PROFILE as string,
           {
-            phone: phoneNumber,
             email: email,
             fetchType: "fetching",
           }

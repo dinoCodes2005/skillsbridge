@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Providers } from "./providers";
-import AuthProvider from "@/components/ui/my-components/authProvider";
+import { ThemeProviders } from "../components/ui/providers/providers";
+import AuthProvider from "@/components/ui/providers/authProvider";
 import { cn } from "@/lib/utils";
-import ProfileProvider from "@/components/ui/my-components/profileProvider";
-import ClientSessionWrapper from "@/components/ui/my-components/clientSessionProvider";
+import ProfileProvider from "@/components/ui/providers/profileProvider";
+import ClientSessionWrapper from "@/components/ui/providers/clientSessionProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,9 +37,9 @@ export default function RootLayout({
               "min-h-screen"
             )}
           >
-            <Providers>
+            <ThemeProviders>
               <ProfileProvider>{children}</ProfileProvider>
-            </Providers>
+            </ThemeProviders>
           </body>
         </html>
       </AuthProvider>

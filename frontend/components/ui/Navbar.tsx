@@ -18,11 +18,11 @@ import {
 } from "@/components/ui/navigation-menu";
 import { auth } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { useAuth } from "./my-components/authProvider";
+import { useAuth } from "./providers/authProvider";
 import ToggleTheme from "./my-components/toggle-theme";
 import { Button } from "./button";
 import { useSession } from "next-auth/react";
-import { useProfile } from "./my-components/profileProvider";
+import { useProfile } from "./providers/profileProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Badge } from "./badge";
 

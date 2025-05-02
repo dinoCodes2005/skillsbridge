@@ -22,23 +22,23 @@ const ProfileSchema = new Schema<iProfile>({
   },
   email: {
     type: String,
-    required: false,
+    required: true,
   },
   first_name: {
     type: String,
-    required: true,
+    required: false,
   },
   last_name: {
     type: String,
-    required: true,
+    required: false,
   },
   language: {
     type: String,
-    required: true,
+    required: false,
   },
   type: {
     type: String,
-    required: true,
+    required: false,
   },
   gender: {
     type: String,

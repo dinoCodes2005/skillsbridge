@@ -3,20 +3,15 @@ import React, { useState, useTransition } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Input } from "../input";
-import { Label } from "@radix-ui/react-label";
 import { MapPin } from "lucide-react";
 import { Button } from "../button";
-import { MapProvider } from "./mapProvider";
+import { MapProvider } from "../providers/mapProvider";
 import { MapComponent } from "./map";
-import { useProfile } from "./profileProvider";
+import { useProfile } from "../providers/profileProvider";
 import axios from "axios";
 
 export default function MapDialog() {
@@ -41,7 +36,7 @@ export default function MapDialog() {
       response.data.results.length > 0
     )
       startTransition(() => {
-        setCurrentAddress(response.data.results);
+        setCurrentAddress(response.data.results[0].formatted_address);
         setOpen(false);
       });
   };

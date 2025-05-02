@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/input-otp";
 import { verify } from "crypto";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/ui/my-components/authProvider";
+import { useAuth } from "@/components/ui/providers/authProvider";
 import { Facebook, Twitter } from "lucide-react";
 import axios from "axios";
 

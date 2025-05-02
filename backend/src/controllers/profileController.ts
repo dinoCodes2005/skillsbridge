@@ -18,12 +18,10 @@ export const createProfile = async (req: Request, res: Response) => {
       return;
     }
 
-    const existingProfile = await Profile.findOne({
-      $or: [{ phone: phone }, { email: email }],
-    });
+    const existingProfile = await Profile.findOne({ email: email });
     if (existingProfile) {
       const updatedProfile = await Profile.findOneAndUpdate(
-        { $or: [{ phone: phone }, { email: email }] },
+        { email: email },
         {
           first_name,
           last_name,
@@ -65,13 +63,11 @@ export const createProfile = async (req: Request, res: Response) => {
 };
 
 export const findProfile = async (req: Request, res: Response) => {
-  const { phone, email, fetchType } = req.body;
-  const existingProfile = await Profile.findOne({
-    $or: [{ phone: phone }, { email: email }],
-  });
+  const { email, fetchType } = req.body;
+  const existingProfile = await Profile.findOne({ email: email });
   if (existingProfile) {
     if (fetchType === "finding") {
-      res.status(409).json({
+      res.status(404).json({
         message: "Profile found !! Redirecting to Home Page.",
       });
       return;
@@ -89,8 +85,13 @@ export const findProfile = async (req: Request, res: Response) => {
       });
       return;
     }
+  } else {
+    const newProfile = await Profile.create({ email: email });
+    res
+      .status(200)
+      .json({
+        message: "Profile not Found !! Redirecting to Profile Page.",
+        newProfile,
+      });
   }
-  res
-    .status(400)
-    .json({ message: "Profile not Found !! Redirecting to Profile Page." });
 };
